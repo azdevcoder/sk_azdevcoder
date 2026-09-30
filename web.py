@@ -16,29 +16,33 @@ PAGE = """<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Calculadora de força de senhas</title>
 <style>
-body{font-family:system-ui,Segoe UI,Roboto,Arial;max-width:760px;margin:32px auto;padding:0 16px;background:#0f1115;color:#e8eaf0}
-.card{background:#181c24;border:1px solid #2a3040;border-radius:12px;padding:20px;margin:16px 0}
-input[type=text]{width:100%;padding:12px;border-radius:8px;border:1px solid #444;background:#0f1115;color:#fff;font-size:16px}
-input[type=number]{width:80px;padding:8px;border-radius:8px;border:1px solid #444;background:#0f1115;color:#fff}
-select{padding:8px;border-radius:8px;border:1px solid #444;background:#0f1115;color:#fff}
+*{box-sizing:border-box}
+body{font-family:system-ui,Segoe UI,Roboto,Arial;max-width:760px;margin:32px auto;padding:0 16px;background:#0f1115;color:#e8eaf0;overflow-x:hidden}
+.card{background:#181c24;border:1px solid #2a3040;border-radius:12px;padding:20px;margin:16px 0;max-width:100%;overflow:hidden;overflow-wrap:break-word}
+input[type=text]{width:100%;max-width:100%;padding:12px;border-radius:8px;border:1px solid #444;background:#0f1115;color:#fff;font-size:16px}
+input[type=number]{width:80px;max-width:100%;padding:8px;border-radius:8px;border:1px solid #444;background:#0f1115;color:#fff}
+select{padding:8px;border-radius:8px;border:1px solid #444;background:#0f1115;color:#fff;max-width:100%}
 label{margin-right:12px;font-size:14px;line-height:2.2}
-.gen{font-family:Consolas,monospace;font-size:16px;background:#0f1115;padding:10px;border-radius:8px;word-break:break-all;margin:6px 0}
-button{padding:12px 20px;border-radius:8px;border:0;background:#4f7cff;color:#fff;font-size:15px;cursor:pointer;margin-top:10px}
+.gen{font-family:Consolas,monospace;font-size:16px;background:#0f1115;padding:10px;border-radius:8px;word-break:break-all;overflow-wrap:anywhere;margin:6px 0;max-width:100%}
+button{padding:12px 20px;border-radius:8px;border:0;background:#4f7cff;color:#fff;font-size:15px;cursor:pointer;margin-top:10px;max-width:100%}
 .bar{height:14px;border-radius:8px;background:#222a38;overflow:hidden;margin:8px 0}
 .fill{height:100%%;background:linear-gradient(90deg,#ff5252,#ffb74d,#81c784,#4f7cff)}
-table{width:100%%;border-collapse:collapse;font-size:14px}
-td{padding:8px 6px;border-bottom:1px solid #2a3040}
-td:last-child{text-align:right;white-space:nowrap}
-.warn{color:#ffb74d}.tip{color:#81c784}.mono{font-family:Consolas,monospace;font-size:13px}
+table{width:100%%;max-width:100%%;border-collapse:collapse;font-size:14px;table-layout:fixed}
+td{padding:8px 6px;border-bottom:1px solid #2a3040;overflow-wrap:break-word;word-break:break-word}
+td:first-child{width:60%%}
+td:last-child{text-align:right;white-space:normal;overflow-wrap:anywhere}
+.warn{color:#ffb74d}.tip{color:#81c784}.mono{font-family:Consolas,monospace;font-size:13px;overflow-wrap:anywhere;word-break:break-word}
 small{color:#9aa3b5}
+h1{font-size:28px;overflow-wrap:break-word}
+@media (max-width:560px){body{margin:16px auto}.card{padding:14px}h1{font-size:22px}table{font-size:13px}td{padding:6px 4px}td:first-child{width:55%%}button{width:100%%}}
 </style></head><body>
-<h1>🔐 Calculadora de força de senhas</h1>
-<p><small>100%% local — nada sai da máquina. Estima tempo médio de quebra em 8 cenários (online → Rig 8x RTX 4090 → bcrypt/Argon2).</small></p>
+<h1>Calculadora de força de senhas</h1>
+ <p><small></small></p>
 <div class="card"><form method="GET" action="/">
 <input type="text" name="password" placeholder="Digite a senha / secret key…" value="%PWD%" autocomplete="off">
 <button type="submit">Calcular</button></form></div>
 %BODY%
-<div class="card"><h2>🎲 Gerador de senhas</h2><form method="GET" action="/">
+<div class="card"><h2>Gerador de senhas</h2><form method="GET" action="/">
 <input type="hidden" name="gen" value="1">
 <label>Tamanho <input type="number" name="len" value="%LEN%" placeholder="auto" min="1" max="128"></label>
 <label>Nível <select name="nivel">%NIVEIS%</select></label><br>
@@ -50,7 +54,6 @@ small{color:#9aa3b5}
 <label>Qtd <input type="number" name="count" value="%COUNT%" min="1" max="20"></label>
 <button type="submit">Gerar</button></form></div>
 %GEN%
-<div class="card"><small>Benchmarks: Hashcat 6.x / RTX 4090 (NTLM ~100 bi/s, rig 8x ~800 bi/s, bcrypt ~350 mil/s, Argon2id ~50 mil/s). Tempos = metade do espaço de busca ÷ taxa. Padrões comuns aplicam desconto de entropia.</small></div>
 </body></html>"""
 
 
@@ -62,9 +65,9 @@ def body_for(pw: str) -> str:
     rows = "".join(
         f"<tr><td>{html.escape(label)}</td><td class='mono'>{format_tempo(a.tempos[sid])}</td></tr>"
         for sid, label, _ in SCENARIOS)
-    avisos = "".join(f"<p class='warn'>⚠ {html.escape(x)}</p>" for x in a.avisos)
-    dicas = "".join(f"<p class='tip'>★ {html.escape(x)}</p>" for x in a.dicas)
-    secret = f"<p>🔑 <b>Secret key detectada:</b> {html.escape(a.secret_tipo)}</p>" if a.eh_secret_key else ""
+    avisos = "".join(f"<p class='warn'>Aviso: {html.escape(x)}</p>" for x in a.avisos)
+    dicas = "".join(f"<p class='tip'>Recomendação: {html.escape(x)}</p>" for x in a.dicas)
+    secret = f"<p><b>Secret key detectada:</b> {html.escape(a.secret_tipo)}</p>" if a.eh_secret_key else ""
     return (f"<div class='card'><h2>{a.score}/100 — {html.escape(a.rotulo)}</h2>"
             f"<div class='bar'><div class='fill' style='width:{w}%%'></div></div>"
             f"<p>Tamanho <b>{a.length}</b> · Pool <b>{a.pool}</b> ({html.escape(', '.join(a.pools_usados))})<br>"
@@ -106,7 +109,7 @@ def gen_body(qs: dict) -> str:
         else:
             pwds = [generate_password(length or 20, **opts) for _ in range(count)]
     except ValueError as e:
-        return f"<div class='card'><p class='warn'>⚠ {html.escape(str(e))}</p></div>"
+        return f"<div class='card'><p class='warn'>Erro: {html.escape(str(e))}</p></div>"
     items = "".join(f"<div class='gen'>{html.escape(p)}</div>" for p in pwds)
     return f"<div class='card'><h2>Geradas ({len(pwds)}×)</h2>{items}<small>A primeira foi analisada abaixo.</small></div>" + body_for(pwds[0])
 
@@ -191,4 +194,4 @@ class H(BaseHTTPRequestHandler):
 if __name__ == "__main__":
     port = int(sys.argv[1]) if len(sys.argv) > 1 else 8000
     print(f"Servindo em http://localhost:{port}  (Ctrl+C p/ parar)")
-    HTTPServer(("127.0.0.1", port), H).serve_forever()
+    HTTPServer(("0.0.0.0", port), H).serve_forever()

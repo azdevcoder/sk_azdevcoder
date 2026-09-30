@@ -1,0 +1,14 @@
+[Unit]
+Description=Calculadora de senhas (forcekeys)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/calculadora-senhas
+ExecStart=/usr/bin/python3 /opt/calculadora-senhas/web.py 8000
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+
