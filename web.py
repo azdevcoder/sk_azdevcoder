@@ -37,7 +37,7 @@ h1{font-size:28px;overflow-wrap:break-word}
 @media (max-width:560px){body{margin:16px auto}.card{padding:14px}h1{font-size:22px}table{font-size:13px}td{padding:6px 4px}td:first-child{width:55%%}button{width:100%%}}
 </style></head><body>
 <h1>Calculadora de força de senhas</h1>
- <p><small></small></p>
+ <p><small>Serviço rodando 100% local — nada sai da sua máquina. Estima tempo médio de quebra em 8 melhores cenários da atualidade (online → Rig 8x RTX 4090 → bcrypt/Argon2) - Atualizado 10/2026</small></p>
 <div class="card"><form method="GET" action="/">
 <input type="text" name="password" placeholder="Digite a senha / secret key…" value="%PWD%" autocomplete="off">
 <button type="submit">Calcular</button></form></div>
